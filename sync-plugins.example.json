@@ -1,0 +1,22 @@
+{
+  "Version": 1,
+  "Plugins": [
+    {
+      "Id": "example.plugin.clock",
+      "Version": "1.2.0",
+      "Url": "https://raw.githubusercontent.com/wngmay/ZhongXianMiddleSchool-ClassislandControl/main/plugins/clock-1.2.0.cipx",
+      "Hash": "sha256:00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
+      "Mirrors": [
+        "https://gcore.jsdelivr.net/gh/wngmay/ZhongXianMiddleSchool-ClassislandControl@main/plugins/clock-1.2.0.cipx"
+      ]
+    }
+  ],
+  "Automation": {
+    "Version": 1,
+    "Url": "https://raw.githubusercontent.com/wngmay/ZhongXianMiddleSchool-ClassislandControl/main/automation/rules.json",
+    "Hash": "sha256:00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
+    "Mirrors": [
+      "https://gcore.jsdelivr.net/gh/wngmay/ZhongXianMiddleSchool-ClassislandControl@main/automation/rules.json"
+    ]
+  }
+}

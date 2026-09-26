@@ -1,0 +1,20 @@
+{
+  "Version": 2,
+  "Plugins": [
+    {
+      "Id": "school.remote.content.sync",
+      "Version": "1.0.1",
+      "Url": "http://127.0.0.1:18099/plugins/test-plugin.cipx",
+      "Hash": "",
+      "Mirrors": [
+        "http://127.0.0.1:18099/mirror/test-plugin.cipx"
+      ]
+    }
+  ],
+  "Automation": {
+    "Version": 2,
+    "Url": "http://127.0.0.1:18099/automation/rules.json",
+    "Hash": "",
+    "Mirrors": []
+  }
+}

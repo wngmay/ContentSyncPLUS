@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>ClassIsland.RemoteContentSync</AssemblyName>
+    <RootNamespace>ClassIsland.RemoteContentSync</RootNamespace>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Platforms>x64</Platforms>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <!-- cipx 包内插件 DLL 位于包根目录，不需要 net8.0 子目录。 -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      Core 不打进插件包：加载时 PluginLoadContext.Load() 返回 null 会回退到默认 ALC，
+      从而复用主机已加载的 ClassIsland.Core，版本差异被自动抹平。
+    -->
+    <PackageReference Include="ClassIsland.Core" Version="2.1.0.1">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="manifest.yml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="icon.png" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="README.md" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!--
+    打包 .cipx：dotnet build -c Release -p:CreateCipx=true
+    只把「本插件 DLL + manifest.yml + icon.png」放进包，避免把 Avalonia 等
+    传递依赖带进插件目录造成程序集冲突。
+  -->
+  <Target Name="CreateCipx" AfterTargets="Build" Condition="'$(CreateCipx)' == 'true'">
+    <PropertyGroup>
+      <CipxStageDir>$(IntermediateOutputPath)cipx\</CipxStageDir>
+      <CipxOutDir>$(MSBuildProjectDirectory)\cipx\</CipxOutDir>
+      <CipxFile>$(CipxOutDir)$(AssemblyName)-$(Version).cipx</CipxFile>
+    </PropertyGroup>
+    <RemoveDir Directories="$(CipxStageDir)" />
+    <ItemGroup>
+      <_CipxPayload Include="$(TargetPath)" />
+      <_CipxPayload Include="$(MSBuildProjectDirectory)\manifest.yml" />
+      <_CipxPayload Include="$(MSBuildProjectDirectory)\icon.png" />
+    </ItemGroup>
+    <MakeDir Directories="$(CipxOutDir)" />
+    <Copy SourceFiles="@(_CipxPayload)" DestinationFolder="$(CipxStageDir)" SkipUnchangedFiles="false" />
+    <ZipDirectory SourceDirectory="$(CipxStageDir)" DestinationFile="$(CipxFile)" Overwrite="true" />
+    <Message Importance="high" Text="已生成插件包：$(CipxFile)" />
+  </Target>
+
+</Project>

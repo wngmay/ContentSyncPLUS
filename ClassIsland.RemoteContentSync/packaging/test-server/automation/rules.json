@@ -1,0 +1,16 @@
+[
+  {
+    "WorkflowId": "remote-sync-smoke-test",
+    "Name": "远程同步冒烟测试工作流",
+    "IsEnabled": true,
+    "Triggers": [],
+    "Ruleset": {
+      "Rules": [],
+      "Mode": "And"
+    },
+    "ActionSet": {
+      "Actions": [],
+      "IsRevertEnabled": false
+    }
+  }
+]
