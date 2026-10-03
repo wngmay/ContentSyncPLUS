@@ -3,3 +3,4 @@ obj/
 cipx/
 *.user
 .vs/
+.codebuddy/

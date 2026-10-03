@@ -28,8 +28,10 @@ ClassIsland.RemoteContentSync/
 ├── ClassIsland.RemoteContentSync.csproj   # net8.0 + ClassIsland.Core 2.1.0.1（ExcludeAssets=runtime）
 ├── manifest.yml                           # id: school.remote.content.sync，apiVersion: 2.0.0.0
 ├── icon.png
-├── Plugin.cs                              # [PluginEntrance] 入口：注册服务 + AppStarted 钩子
+├── Plugin.cs                              # [PluginEntrance] 入口：注册服务 + 设置页 + AppStarted 钩子
 ├── Models/                                # 清单 / 配置 / 状态的数据模型
+├── Views/SettingsPages/
+│   └── RemoteSyncSettingsPage.axaml(.cs)  # 设置页：可视化配置 + 立即同步 + 预览提醒
 ├── Services/
 │   ├── RemoteSyncService.cs               # 主流程编排
 │   ├── CipxInstallService.cs              # 下载 .cipx、校验、放入待安装目录
@@ -40,6 +42,8 @@ ClassIsland.RemoteContentSync/
 ├── Utils/                                 # HttpHelper / HashHelper / VersionHelper / AtomicFile
 ├── packaging/                             # 打包脚本与说明
 └── cipx/                                  # 构建产物（.cipx）
+
+ClassIsland.RemoteContentSync.Tests/       # xUnit 单元测试（覆盖 Utils / SettingsService / 模型序列化）
 ```
 
 ---
@@ -206,6 +210,24 @@ python -m http.server 18099 --bind 127.0.0.1
 
 建议同时把 `AutomationConfigName` 改成 `RemoteSyncTest` 之类的独立名字，避免覆盖正在使用的 `Default.json`；测完删掉 `state.json` 与 `settings.json` 让插件重新生成默认值即可。
 
+### 设置界面与预览提醒
+
+插件注册了设置页「远程内容同步」，可在 ClassIsland 的【应用设置】窗口导航栏中找到。它可视化编辑 `settings.json` 的全部字段（清单地址、镜像、同步间隔、自动安装、白名单、自动化配置名、哈希校验策略、日志保留天数），保存即生效。
+
+设置页底部提供两个测试入口：
+
+- **预览提醒**：弹出一条顶部提醒，用于核对提醒显示是否正常（因为实际触发「有更新待重启」的机会很少）。
+- **立即同步**：手动执行一次完整同步流程，方便在没有真实更新时验证链路。
+
+### 单元测试
+
+纯逻辑部分（版本比较、SHA256、下载地址链、原子写文件、配置归一化、设置读写、模型序列化）均有 xUnit 单元测试：
+
+```powershell
+cd ClassIsland.RemoteContentSync.Tests
+dotnet test
+```
+
 ## 8. 已知限制
 
 - 插件自身无法自我更新（本插件把自己装进 `Plugins/` 后，更新仍需人工替换包）
@@ -217,4 +239,6 @@ python -m http.server 18099 --bind 127.0.0.1
 
 ## 9. 许可证
 
-本项目引用 LGPL-3.0-only 的 `ClassIsland.Core`，故整体同样遵循 LGPL-3.0-only。
+本项目遵循 **GNU GPL-3.0-or-later**（GPLv3 或更高版本），完整许可文本见仓库根目录 `LICENSE`。
+
+`ClassIsland.Core`（本插件引用的主机核心程序集）自 ClassIsland 1.6.0.0 起采用 GPLv3；本插件通过运行时动态加载该程序集（不随包分发，`<ExcludeAssets>runtime</ExcludeAssets>`），为与上游许可兼容，整体同样采用 GPLv3 或更高版本。

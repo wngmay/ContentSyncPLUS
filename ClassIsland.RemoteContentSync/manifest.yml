@@ -5,7 +5,7 @@ id: school.remote.content.sync
 name: 远程内容同步
 description: 在 ClassIsland 启动时从远程静态仓库同步插件包（.cipx）与自动化规则，并提示下次重启生效。
 author: ZhongXianMiddleSchool IT
-version: 1.0.0.0
+version: 1.1.0.0
 # 低于 2.0.0.0 会被判定为 PluginLoadStatus.Error
 apiVersion: 2.0.0.0
 # 按 Core 2.1.0.1 编译，可同时跑在 2.1.0.x 与 2.1.1.x 主机上

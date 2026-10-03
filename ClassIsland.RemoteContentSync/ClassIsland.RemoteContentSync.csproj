@@ -9,8 +9,8 @@
     <RootNamespace>ClassIsland.RemoteContentSync</RootNamespace>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Platforms>x64</Platforms>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.1.0</Version>
+    <FileVersion>1.1.0.0</FileVersion>
     <!-- cipx 包内插件 DLL 位于包根目录，不需要 net8.0 子目录。 -->
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
@@ -23,6 +23,11 @@
     <PackageReference Include="ClassIsland.Core" Version="2.1.0.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 让单元测试项目能访问 internal 的工具类（Utils 下的 helper 均为 internal）。 -->
+    <InternalsVisibleTo Include="ClassIsland.RemoteContentSync.Tests" />
   </ItemGroup>
 
   <ItemGroup>

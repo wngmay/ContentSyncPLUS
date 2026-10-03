@@ -20,6 +20,7 @@ public sealed class RemoteSyncService
     private readonly SettingsService _settingsService;
     private readonly CipxInstallService _cipxInstallService;
     private readonly AutomationSyncService _automationSyncService;
+    private readonly CloudUploadService _cloudUploadService;
     private readonly LogService _log;
 
     private RemoteSyncNotificationProvider? _notificationProvider;
@@ -31,10 +32,14 @@ public sealed class RemoteSyncService
         _settingsService = new SettingsService(configFolder);
         _cipxInstallService = new CipxInstallService(log);
         _automationSyncService = new AutomationSyncService(log);
+        _cloudUploadService = new CloudUploadService(log);
     }
 
     /// <summary>最近一次实际使用的配置，供外部读取定时同步间隔。</summary>
     public SyncSettings? CurrentSettings { get; private set; }
+
+    /// <summary>设置读写服务，供设置页直接读写 settings.json。</summary>
+    public SettingsService SettingsService => _settingsService;
 
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
@@ -170,6 +175,18 @@ public sealed class RemoteSyncService
         }
 
         _log.Info("========== 远程内容同步结束 ==========");
+    }
+
+    /// <summary>
+    /// 一键上传：把本机全部配置文件（Settings.json + Config 目录所有 JSON，含集控与各插件配置）
+    /// 以单个提交上传到配置的 GitHub 仓库，并通过顶部提醒反馈结果。
+    /// </summary>
+    public async Task<CloudUploadService.UploadResult> UploadBackupAsync(CancellationToken cancellationToken = default)
+    {
+        var settings = _settingsService.LoadSettings();
+        var result = await _cloudUploadService.UploadAsync(settings, cancellationToken).ConfigureAwait(false);
+        Notify(result.Message);
+        return result;
     }
 
     /// <summary>

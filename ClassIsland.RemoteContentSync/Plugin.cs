@@ -1,7 +1,12 @@
 using ClassIsland.Core;
 using ClassIsland.Core.Abstractions;
+using ClassIsland.Core.Abstractions.Services;
 using ClassIsland.Core.Attributes;
+using ClassIsland.Core.Extensions.Registry;
 using ClassIsland.RemoteContentSync.Services;
+using ClassIsland.RemoteContentSync.Views.SettingsPages;
+using ClassIsland.Shared;
+using Avalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -36,12 +41,18 @@ public class Plugin : PluginBase
         _syncService = new RemoteSyncService(configFolder, _log);
         services.AddSingleton(_syncService);
 
+        // 注册设置页，让所有配置项都能在 ClassIsland 设置窗口可视化编辑，
+        // 并提供「立即同步」「预览提醒」两个测试入口。
+        services.AddSettingsPage<RemoteSyncSettingsPage>();
+
         // 主机完成启动后再开始同步，避免拖慢启动、也确保 IAppHost 已可用
         AppBase.Current.AppStarted += OnAppStarted;
     }
 
     private void OnAppStarted(object? sender, EventArgs e)
     {
+        RegisterTrayMenu();
+
         _ = Task.Run(async () =>
         {
             // 启动后稍等，把网络 IO 让开给本体的其他初始化
@@ -58,6 +69,46 @@ public class Plugin : PluginBase
             await RunOnceAsync().ConfigureAwait(false);
             ScheduleTimer();
         });
+    }
+
+    /// <summary>
+    /// 在主托盘图标的「更多选项」菜单中注册「一键上传配置到云端」入口。
+    /// </summary>
+    private void RegisterTrayMenu()
+    {
+        try
+        {
+            var tray = IAppHost.TryGetService<ITaskBarIconService>();
+            var sync = _syncService;
+            if (tray == null || sync == null)
+            {
+                _log?.Warn("未获取到托盘图标服务，云端上传入口不可用（仍可在设置页触发）。");
+                return;
+            }
+
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                try
+                {
+                    var item = new NativeMenuItem
+                    {
+                        Header = "一键上传配置到云端",
+                        ToolTip = "把本机 ClassIsland 全部配置上传到 GitHub 仓库备份",
+                        Command = new SimpleCommand(() => sync.UploadBackupAsync())
+                    };
+                    tray.MoreOptionsMenuItems.Add(item);
+                    _log?.Info("已注册托盘菜单：一键上传配置到云端。");
+                }
+                catch (Exception ex)
+                {
+                    _log?.Error("注册托盘菜单项失败。", ex);
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _log?.Error("获取托盘图标服务失败。", ex);
+        }
     }
 
     private void ScheduleTimer()

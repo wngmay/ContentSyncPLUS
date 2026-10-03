@@ -1,0 +1,103 @@
+<ci:SettingsPageBase x:Class="ClassIsland.RemoteContentSync.Views.SettingsPages.RemoteSyncSettingsPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:ci="http://classisland.tech/schemas/xaml/core"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    mc:Ignorable="d"
+    d:DesignHeight="640" d:DesignWidth="800"
+    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+    Background="{DynamicResource MaterialDesignPaper}"
+    FontFamily="{StaticResource HarmonyOsSans}"
+    TextElement.FontSize="14">
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="16">
+
+            <TextBlock Text="远程内容同步" FontSize="22" FontWeight="SemiBold" />
+            <TextBlock Text="配置从远程仓库同步插件包（.cipx）与自动化规则的行为。保存后下次同步立即生效。"
+                       Opacity="0.7" TextWrapping="Wrap" />
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="同步清单地址（SyncManifestUrl）" FontWeight="SemiBold" />
+                <TextBox x:Name="ManifestUrlBox" Watermark="https://.../sync-plugins.json" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="备用镜像地址（每行一个）" FontWeight="SemiBold" />
+                <TextBox x:Name="MirrorsBox" AcceptsReturn="True" MinHeight="72"
+                         Watermark="https://gcore.jsdelivr.net/gh/.../sync-plugins.json" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="定时同步间隔（分钟，0 = 仅启动时）" FontWeight="SemiBold" />
+                <NumericUpDown x:Name="IntervalBox" Minimum="0" Maximum="10080" Increment="5" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="自动安装" FontWeight="SemiBold" />
+                <ToggleSwitch x:Name="AutoInstallSwitch" OnContent="下载后放入待安装目录" OffContent="仅记录不下载" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="插件白名单（每行一个，留空 = 全部允许）" FontWeight="SemiBold" />
+                <TextBox x:Name="AllowedIdsBox" AcceptsReturn="True" MinHeight="72"
+                         Watermark="example.plugin.clock" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="自动化配置文件名（写入 Config/Automations/{名称}.json）" FontWeight="SemiBold" />
+                <TextBox x:Name="AutomationConfigNameBox" Watermark="Default" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="哈希校验失败时" FontWeight="SemiBold" />
+                <ComboBox x:Name="MismatchActionBox">
+                    <ComboBoxItem Content="放弃本次更新（Abort）" />
+                    <ComboBoxItem Content="忽略校验，仍然写入（Ignore）" />
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="日志保留天数" FontWeight="SemiBold" />
+                <NumericUpDown x:Name="LogRetentionBox" Minimum="1" Maximum="365" Increment="1" />
+            </StackPanel>
+
+            <TextBlock Text="云端备份（一键上传）" FontSize="18" FontWeight="SemiBold" Margin="0,12,0,0" />
+            <TextBlock Text="把本机 ClassIsland 的全部配置文件（Settings.json 与 Config 目录下所有 JSON，覆盖集控本体与各插件的全部配置）以单个提交上传到 GitHub 仓库备份。令牌仅保存在本机配置目录，需要目标仓库的写入权限。"
+                       Opacity="0.7" TextWrapping="Wrap" />
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="GitHub 令牌（PAT）" FontWeight="SemiBold" />
+                <TextBox x:Name="GitHubTokenBox" PasswordChar="•" Watermark="ghp_xxxx（需要 repo 写入权限）" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="仓库（owner/repo）" FontWeight="SemiBold" />
+                <TextBox x:Name="GitHubRepoBox" Watermark="wngmay/ZhongXianMiddleSchool-ClassislandControl" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="分支（不存在时自动创建）" FontWeight="SemiBold" />
+                <TextBox x:Name="GitHubBranchBox" Watermark="main" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="上传目录（可用 {Machine} 占位符，替换为本机名）" FontWeight="SemiBold" />
+                <TextBox x:Name="GitHubUploadPathBox" Watermark="backups/{Machine}" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="GitHub API 基地址（不可直连时可换加速代理）" FontWeight="SemiBold" />
+                <TextBox x:Name="GitHubApiBaseBox" Watermark="https://api.github.com" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+                <Button x:Name="SaveButton" Content="保存设置" Click="OnSaveClick" />
+                <Button x:Name="SyncNowButton" Content="立即同步" Click="OnSyncNowClick" />
+                <Button x:Name="PreviewButton" Content="预览提醒" Click="OnPreviewClick" />
+                <Button x:Name="UploadButton" Content="一键上传配置到云端" Click="OnUploadClick" />
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</ci:SettingsPageBase>
